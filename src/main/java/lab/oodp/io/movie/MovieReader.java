@@ -1,13 +1,14 @@
 package lab.oodp.io.movie;
 
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+//import java.io.DataInputStream;
+//import java.io.FileInputStream;
+//import java.io.IOException;
 
 import lab.oodp.Keyboard;
 
 public class MovieReader {
-	String fileName = null;
+	String fileName = "movie.dat";
 	Movie[] films = null;
 	
     public void setFileName(String fileName) {
@@ -49,9 +50,35 @@ public class MovieReader {
      * @return
      */
     public Movie[] loadMovies(String fileName) {
-    	//TODO: remove return null below, load movies from data file, 
-        
-    	return null;
+        //TODO: remove return null below, load movies from data file,
+        Movie[] films = new Movie[19];
+        File myFile = new File(fileName);
+
+        int i = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(myFile)))
+        {
+            String[] fields = null;
+            String line = null;
+
+            while ((line = reader.readLine()) != null) {
+                fields = line.split(",");
+
+                Movie film = new Movie(fields[0],Integer.valueOf(fields[1]),Integer.valueOf(fields[2]),fields[3]);
+
+                films[i] = film;
+                i++;
+
+            }
+
+        }
+
+        catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+
+
+        return films;
 
     }
 
