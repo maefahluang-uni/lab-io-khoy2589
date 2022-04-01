@@ -1,22 +1,25 @@
 package lab.oodp.io.movie;
 
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import lab.oodp.Keyboard;
 
 public class MovieWriter {
-	String fileName = "movies.dat";//add file name
+	String fileName = null;
+
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
 
-	public void start() throws IOException{
+	public void start() {
 
 		// Get a file name from the user
 		if(fileName ==null) {
 			System.out.print("Enter a file name: ");
-			String fileName = Keyboard.readInput();
+			fileName = Keyboard.readInput();
 		}
 
 		// Create and fill Movies array
@@ -32,33 +35,19 @@ public class MovieWriter {
 	protected void saveMovies(String fileName, Movie[] films) {
 		// TODO: save array of movies: films into a file, uncomment sysout below
 
-		File fileMovies = new File(fileName);
+		try (DataOutputStream out = new DataOutputStream(new FileOutputStream(fileName))) {
+			out.writeInt(films.length);
+			for(int i=0; i<films.length; i++) {
+				out.writeUTF(films[i].getName());
+				out.writeInt(films[i].getYear());
+				out.writeInt(films[i].getLengthInMinutes());
+				out.writeUTF(films[i].getDirector());
 
-		if(fileMovies.createNewFile())
-		{
-			System.out.println("File created: " + fileMovies.getName());
-		}
-		else
-		{
-			System.out.println("File already exists.");
-		}
-
-		try(BufferedWriter bW = new BufferedWriter(new FileWriter(fileMovies))){
-			for(Movie film : films){
-				bW.write(String.valueOf(film.getName()));
-				bW.write(",");
-				bW.write(String.valueOf(film.getYear()));
-				bW.write(",");
-				bW.write(String.valueOf(film.getLengthInMinutes()));
-				bW.write(",");
-				bW.write(String.valueOf(film.getDirector()));
-				bW.newLine();
 			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		catch (IOException e){
-			System.out.println("Error: " + e.getMessage());
-		}
-		System.out.println("Movies saved successfully to " + fileName + "!");
 	}
 
 	/**
@@ -88,7 +77,7 @@ public class MovieWriter {
 		return films;
 	}
 
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args) {
 		new MovieWriter().start();
 	}
 }
