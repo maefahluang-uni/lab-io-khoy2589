@@ -1,35 +1,34 @@
 package lab.oodp.io.movie;
 
-import java.io.*;
-//import java.io.DataInputStream;
-//import java.io.FileInputStream;
-//import java.io.IOException;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 import lab.oodp.Keyboard;
 
 public class MovieReader {
-	String fileName = "movie.dat";
-	Movie[] films = null;
-	
-    public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-    
-	public Movie[] getFilms() {
-		return films;
-	}
+    String fileName = null;
+    Movie[] films = null;
 
-	public void start() {
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public Movie[] getFilms() {
+        return films;
+    }
+
+    public void start() {
 
 
         // Get a file name from the user
-    	if(fileName == null) {
-	        System.out.print("Enter a file name: ");
-	        fileName = Keyboard.readInput();
-    	}
+        if(fileName == null) {
+            System.out.print("Enter a file name: ");
+            fileName = Keyboard.readInput();
+        }
 
         // Load the movie data
-       films = loadMovies(fileName);
+        films = loadMovies(fileName);
 
         // Do some stuff with the data to check that its working
         printMoviesArray(films);
@@ -51,35 +50,19 @@ public class MovieReader {
      */
     public Movie[] loadMovies(String fileName) {
         //TODO: remove return null below, load movies from data file,
-        Movie[] films = new Movie[19];
-        File myFile = new File(fileName);
 
-        int i = 0;
-        try (BufferedReader reader = new BufferedReader(new FileReader(myFile)))
-        {
-            String[] fields = null;
-            String line = null;
-
-            while ((line = reader.readLine()) != null) {
-                fields = line.split(",");
-
-                Movie film = new Movie(fields[0],Integer.valueOf(fields[1]),Integer.valueOf(fields[2]),fields[3]);
-
-                films[i] = film;
-                i++;
-
+        try (DataInputStream in = new DataInputStream(new FileInputStream(fileName))){
+            int numMovies = in.readInt();
+            films = new Movie[numMovies];
+            for(int i=0; i<numMovies; i++) {
+                films[i] = new Movie(in.readUTF(), in.readInt(), in.readInt(), in.readUTF());
             }
+            System.out.println("Movies loaded successfully from " + fileName + "!");
 
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        catch (IOException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-
-
-
         return films;
-
     }
 
     private void printMoviesArray(Movie[] films) {
